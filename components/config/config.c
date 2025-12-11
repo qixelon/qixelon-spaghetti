@@ -4,8 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-static const char *TAG = "config";
+#include "logger.h"
 
 typedef struct kv {
     char *key;
@@ -72,7 +71,7 @@ bool config_init(void) {
     esp_err_t ret = esp_vfs_spiffs_register(&conf);
 
     if(ret != ESP_OK) {
-        ESP_LOGE(TAG, "SPIFFS mount failed: %s", esp_err_to_name(ret));
+        LOG_ERROR("config", "SPIFFS mount failed: %s", esp_err_to_name(ret));
         return false;
     }
 
