@@ -1,5 +1,5 @@
 #include "config.h"
-#include "esp_spiffs.h"
+#include "esp_littlefs.h"
 #include "esp_log.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,17 +61,16 @@ static kv_t* kv_find(section_t *sec, const char *key) {
 }
 
 bool config_init(void) {
-    esp_vfs_spiffs_conf_t conf = {
-        .base_path = "/spiffs/config",
+    esp_vfs_littlefs_conf_t conf = {
+        .base_path = "/mnt/config",
         .partition_label = "config",
-        .max_files = 10,
-        .format_if_mount_failed = true
+        .format_if_mount_failed = true,
     };
 
-    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    esp_err_t ret = esp_vfs_littlefs_register(&conf);
 
     if(ret != ESP_OK) {
-        LOG_ERROR("config", "SPIFFS mount failed: %s", esp_err_to_name(ret));
+        LOG_ERROR("config", "Little FS mount failed: %s", esp_err_to_name(ret));
         return false;
     }
 
