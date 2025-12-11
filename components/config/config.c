@@ -65,7 +65,7 @@ bool config_init(void) {
         .base_path = "/spiffs/config",
         .partition_label = "config",
         .max_files = 10,
-        .format_if_mount_failed = false
+        .format_if_mount_failed = true
     };
 
     esp_err_t ret = esp_vfs_spiffs_register(&conf);
