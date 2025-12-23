@@ -37,6 +37,7 @@ static section_t* section_create(const char *name) {
 }
 
 static section_t* section_find(const char *name) {
+    if (name == NULL) name = "";
     section_t *sec = sections;
     while(sec) {
         if(strcmp(sec->name, name) == 0) return sec;
@@ -73,7 +74,12 @@ bool config_load_file(const char *filename) {
     if(!f) return false;
 
     char line[256];
-    section_t *current_sec = NULL;
+    section_t *current_sec = section_find("");
+    if (!current_sec) {
+        current_sec = section_create("");
+        current_sec->next = sections;
+        sections = current_sec;
+    }
 
     while(fgets(line, sizeof(line), f)) {
         char *trim = line;
@@ -84,9 +90,20 @@ bool config_load_file(const char *filename) {
             char *end = strchr(trim, ']');
             if(!end) continue;
             *end = 0;
-            current_sec = section_create(trim+1);
-            current_sec->next = sections;
-            sections = current_sec;
+            char *sec_name = trim + 1;
+            while(*sec_name == ' ' || *sec_name == '\t') sec_name++;
+            char *sec_end = sec_name + strlen(sec_name) - 1;
+            while(sec_end > sec_name && (*sec_end == ' ' || *sec_end == '\t' || *sec_end == '\r' || *sec_end == '\n')) {
+                *sec_end = 0;
+                sec_end--;
+            }
+
+            current_sec = section_find(sec_name);
+            if(!current_sec) {
+                current_sec = section_create(sec_name);
+                current_sec->next = sections;
+                sections = current_sec;
+            }
         } else if(current_sec) {
             char *eq = strchr(trim, '=');
             if(!eq) continue;
@@ -94,18 +111,40 @@ bool config_load_file(const char *filename) {
             char *key = trim;
             char *value = eq+1;
 
+            char *key_end = key + strlen(key) - 1;
+            while(key_end > key && (*key_end == ' ' || *key_end == '\t' || *key_end == '\r' || *key_end == '\n')) {
+                *key_end = 0;
+                key_end--;
+            }
+
             while(*value == ' ' || *value == '\t') value++;
+            bool quoted = false;
             if(*value == '"') {
                 value++;
                 char *end_quote = strchr(value, '"');
-                if(end_quote) *end_quote = 0;
+                if(end_quote) {
+                    *end_quote = 0;
+                    quoted = true;
+                }
             }
-            char *newline = strchr(value, '\n');
-            if(newline) *newline = 0;
+            
+            if (!quoted) {
+                char *val_end = value + strlen(value) - 1;
+                while(val_end >= value && (*val_end == ' ' || *val_end == '\t' || *val_end == '\r' || *val_end == '\n')) {
+                    *val_end = 0;
+                    val_end--;
+                }
+            }
 
-            kv_t *kv = kv_create(key, value);
-            kv->next = current_sec->kv_list;
-            current_sec->kv_list = kv;
+            kv_t *kv = kv_find(current_sec, key);
+            if(kv) {
+                free(kv->value);
+                kv->value = strdup(value);
+            } else {
+                kv = kv_create(key, value);
+                kv->next = current_sec->kv_list;
+                current_sec->kv_list = kv;
+            }
         }
     }
 
