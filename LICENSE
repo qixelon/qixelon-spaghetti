@@ -1,0 +1,35 @@
+Business Source License 1.1
+
+Copyright (c) 2025 Oskar Nizioł
+
+Parameters
+----------
+
+Licensor: Oskar Nizioł (individual)
+
+Licensed Work: This repository and all its contents
+
+Additional Use Grant:
+A future business or legal entity to be formed and controlled by the Licensor
+is granted a commercial license to use the Licensed Work in production
+and commercial activities.
+
+Change Date: 2035-01-17
+
+Change License: GNU General Public License v3.0 or later
+
+Terms
+-----
+
+The Licensed Work is provided under the terms of the Business Source License 1.1.
+
+You may use, modify, and redistribute the Licensed Work for non-commercial purposes only.
+
+Use of the Licensed Work in production, or as part of a commercial product or service,
+by commercial entities (except the entity mentioned in the Additional Use Grant) is not permitted prior to the Change Date.
+
+On the Change Date, the Licensed Work will automatically be made available under the
+Change License stated above.
+
+For full license text and details, see:
+https://mariadb.com/bsl11/
